@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 import { useDispatch } from "react-redux";
-import Navbar from './Components/Navbar/Navbar'
+import Navbar from "./Components/Navbar/Navbar";
 import Footer from "./Components/Footer/Footer"; // Import Footer
 import authService from "./appwrite/auth";
 import { login, logout } from "./store/authSlice";
@@ -30,10 +30,9 @@ function App() {
       {loading ? (
         <div>Loading...</div>
       ) : (
-       <main>
-    {/* <Outlet/> */}
-    <h1>Main</h1>
-       </main>
+        <main>
+          <Outlet />
+        </main>
       )}
       <Footer /> {/* Display Footer */}
     </>

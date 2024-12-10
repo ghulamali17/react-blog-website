@@ -14,17 +14,33 @@ export class Service {
 
   async createPost({ title, slug, content, featuredImage, status, userId }) {
     try {
-      return await this.databases.createDocument(
-        conf.databaseID,
-        conf.collectionID,
-        slug,
-        { title, content, featuredImage, status, userId }
-      );
+        if (!conf.databaseID || !conf.collectionID) {
+            throw new Error("Invalid database or collection configuration");
+        }
+
+        const response = await this.databases.createDocument(
+            conf.databaseID,
+            conf.collectionID,
+            slug, // Ensure this is unique, or use ID.unique() for auto-ID
+            {
+                title,
+                content,
+                featuredImage,
+                status,
+                userId,
+            }
+        );
+        return response;
     } catch (error) {
-      console.error("Error creating post:", error);
-      throw error;
+        console.error("Appwrite Service :: createPost :: Error:", {
+            message: error.message,
+            stack: error.stack,
+            response: error.response,
+        });
+        throw error; // Propagate to the caller
     }
-  }
+}
+
 
   async updatePost(slug, { title, content, featuredImage, status }) {
     try {
@@ -53,11 +69,35 @@ export class Service {
       throw error;
     }
   }
+  async getPost(slug) {
+    try {
+      return await this.databases.getDocument(
+        conf.databaseID,
+        conf.collectionID,
+        slug
+      );
+    } catch (error) {
+      console.log("Appwrite serive :: getPost :: error", error);
+      return false;
+    }
+  }
 
+  async getPosts(queries = [Query.equal("status", "active")]) {
+    try {
+      return await this.databases.listDocuments(
+        conf.databaseID,
+        conf.collectionID,
+        queries
+      );
+    } catch (error) {
+      console.log("Appwrite serive :: getPosts :: error", error);
+      return false;
+    }
+  }
   async uploadFile(file) {
     try {
       return await this.bucket.createFile(
-        conf.appwriteBucketId,
+        conf.bucketID,
         ID.unique(),
         file
       );
@@ -69,7 +109,7 @@ export class Service {
 
   async deleteFile(fileId) {
     try {
-      await this.bucket.deleteFile(conf.appwriteBucketId, fileId);
+      await this.bucket.deleteFile(conf.bucketID, fileId);
       return true;
     } catch (error) {
       console.error("Error deleting file:", error);
@@ -79,7 +119,7 @@ export class Service {
 
   getFilePreview(fileId) {
     try {
-      return this.bucket.getFilePreview(conf.appwriteBucketId, fileId);
+      return this.bucket.getFilePreview(conf.bucketID, fileId);
     } catch (error) {
       console.error("Error getting file preview:", error);
       throw error;

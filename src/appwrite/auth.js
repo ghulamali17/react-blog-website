@@ -7,9 +7,9 @@ const authService = new (class {
 
   constructor() {
     this.client
-      .setEndpoint(conf.appWriteUrl) // Your API Endpoint
-      .setProject(conf.projectID); // Your Project ID
-    this.account = new Account(this.client); // Initialize Appwrite Account SDK
+      .setEndpoint(conf.appWriteUrl)
+      .setProject(conf.projectID); 
+    this.account = new Account(this.client); //
   }
 
   // Create a new account and log in immediately
@@ -22,25 +22,24 @@ const authService = new (class {
         return userAccount;
       }
     } catch (error) {
-      throw error; // Throw any error encountered
+      throw error; 
     }
   }
 
   // Login user with email and password
-  async login({ email, password }) {
+  async login({email, password}) {
     try {
-      return await this.account.createEmailSession(email, password);
+        return await this.account.createEmailPasswordSession(email, password);
     } catch (error) {
-      throw error; // Throw error if login fails
+        throw error;
     }
-  }
-
+}
   // Get the currently logged-in user
   async getCurrentUser() {
     try {
       return await this.account.get();
     } catch (error) {
-      throw error; // Throw error if fetching user fails
+      throw error; 
     }
   }
 
@@ -49,7 +48,7 @@ const authService = new (class {
     try {
       await this.account.deleteSessions("current");
     } catch (error) {
-      throw error; // Throw error if logout fails
+      throw error; 
     }
   }
 })();
